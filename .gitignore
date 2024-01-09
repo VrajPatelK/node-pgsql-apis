@@ -1,2 +1,8 @@
+# project files & folders
 /node_modules
 .env
+.gitignore
+
+# personal files & folders
+functionalities.txt
+create-tables-queries.txt
