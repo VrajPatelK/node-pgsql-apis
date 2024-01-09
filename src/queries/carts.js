@@ -1,29 +1,14 @@
 const createNewCart = `
-INSERT INTO CARTS (userId, productId, quantity)
+INSERT INTO CARTS (USER_ID, PRODUCT_ID, quantity)
 VALUES
-  ($1,$2)`;
-
-const createNewCarts = `INSERT INTO CARTS (userId, productId, quantity) VALUES %L`;
+  ($1,$2,$3)`;
 const getAllCarts = `SELECT * FROM CARTS`;
-const getCartsById = `SELECT * FROM CARTS WHERE ID in (%L)`;
-const getCartsByUserId = `SELECT * FROM CARTS WHERE userId = $1`;
-const updateCartById = `
-UPDATE CARTS SET 
-USERID = $2, 
-PRODUCTID = $3, 
-QUANTITY = $4,
-WHERE ID = $1`;
-
-const deleteCartById = `DELETE FROM CARTS WHERE ID = $1`;
-const deleteCartsById = `DELETE FROM CARTS WHERE ID in (%L)`;
+const getCartsByUserId = `SELECT * FROM CARTS WHERE USER_ID = $1`;
+const deleteCartByUserIdAndProductId = `DELETE FROM CARTS WHERE USER_ID = $1 AND PRODUCT_ID = $2`;
 
 export {
   createNewCart,
-  createNewCarts,
   getAllCarts,
   getCartsByUserId,
-  getCartsById,
-  updateCartById,
-  deleteCartById,
-  deleteCartsById,
+  deleteCartByUserIdAndProductId,
 };
