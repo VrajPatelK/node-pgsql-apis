@@ -12,8 +12,8 @@ import {
 } from "../queries/products.js";
 
 async function createNewProductsApi(req, res) {
-  var records = req.body;
-  records = records?.map((record, index) => [
+  var records = req?.body;
+  records = records?.map((record) => [
     record.name,
     record.description,
     record.price,
@@ -21,33 +21,50 @@ async function createNewProductsApi(req, res) {
     record.category,
   ]);
   const query = format(createNewProducts, records);
-  // console.log(query);
-  pool.query(query, (error, response) => {
-    if (error) throw error;
-    return res
-      .status(200)
-      .json({ message: `records inserted : ${response.rowCount}` });
-  });
-}
-async function createNewProductApi(req, res) {
-  const { name, description, price, quantity_in_stock, category } = req.body;
-  pool.query(
-    createNewProduct,
-    [name, description, price, quantity_in_stock, category],
-    (error, response) => {
+  try {
+    pool.query(query, (error, records) => {
       if (error) throw error;
       return res
         .status(200)
-        .json({ message: `records inserted : ${response.rowCount}` });
-    }
-  );
+        .json({ message: `records inserted : ${records.rowCount}` });
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Internal Server Error", errorMessage: error.message });
+  }
+}
+async function createNewProductApi(req, res) {
+  const { name, description, price, quantity_in_stock, category } = req.body;
+  try {
+    pool.query(
+      createNewProduct,
+      [name, description, price, quantity_in_stock, category],
+      (error, records) => {
+        if (error) throw error;
+        return res
+          .status(200)
+          .json({ message: `records inserted : ${records.rowCount}` });
+      }
+    );
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Internal Server Error", errorMessage: error.message });
+  }
 }
 
 async function getAllProductsApi(req, res) {
-  pool.query(getAllProducts, (error, response) => {
-    if (error) throw error;
-    return res.status(200).json(response.rows);
-  });
+  try {
+    pool.query(getAllProducts, (error, records) => {
+      if (error) throw error;
+      return res.status(200).json(records.rows);
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Internal Server Error", errorMessage: error.message });
+  }
 }
 
 async function getProductsByIdInRangeApi(req, res) {
@@ -59,55 +76,85 @@ async function getProductsByIdInRangeApi(req, res) {
     (_, index) => start + index
   );
   const query = format(getProductsById, ids);
-  pool.query(query, (error, response) => {
-    if (error) throw error;
-    return res.status(200).json(response.rows);
-  });
+  try {
+    pool.query(query, (error, records) => {
+      if (error) throw error;
+      return res.status(200).json(records.rows);
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Internal Server Error", errorMessage: error.message });
+  }
 }
 
 async function getProductByIdApi(req, res) {
   const { id } = req.params;
-  pool.query(getProductById, [id], (error, response) => {
-    if (error) throw error;
-    return res.status(200).json(response.rows);
-  });
+  try {
+    pool.query(getProductById, [id], (error, records) => {
+      if (error) throw error;
+      return res.status(200).json(records.rows);
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Internal Server Error", errorMessage: error.message });
+  }
 }
 
 async function updateProductByIdApi(req, res) {
   const { id } = req.params;
   const { name, description, price, quantity_in_stock, category } = req.body;
-  pool.query(
-    updateProductById,
-    [id, name, description, price, quantity_in_stock, category],
-    (error, response) => {
-      if (error) throw error;
-      return res
-        .status(200)
-        .json({ message: `records updated : ${response.rowCount}` });
-    }
-  );
+  try {
+    pool.query(
+      updateProductById,
+      [id, name, description, price, quantity_in_stock, category],
+      (error, records) => {
+        if (error) throw error;
+        return res
+          .status(200)
+          .json({ message: `records updated : ${records.rowCount}` });
+      }
+    );
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Internal Server Error", errorMessage: error.message });
+  }
 }
 
 async function deleteProductByIdApi(req, res) {
   const { id } = req.params;
-  pool.query(deleteProductById, [id], (error, response) => {
-    if (error) throw error;
+  try {
+    pool.query(deleteProductById, [id], (error, records) => {
+      if (error) throw error;
+      return res
+        .status(200)
+        .json({ message: `records deleted : ${records.rowCount}` });
+    });
+  } catch (error) {
     return res
-      .status(200)
-      .json({ message: `records deleted : ${response.rowCount}` });
-  });
+      .status(500)
+      .json({ message: "Internal Server Error", errorMessage: error.message });
+  }
 }
 
 async function deleteProductsByIdApi(req, res) {
   const { ids } = req.params;
   var ids_converted = ids.split(",").map((id) => parseInt(id));
   const query = format(deleteProductsById, ids_converted);
-  pool.query(query, (error, response) => {
-    if (error) throw error;
+  try {
+    pool.query(query, (error, records) => {
+      if (error) throw error;
+      return res
+        .status(200)
+        .json({ message: `records deleted : ${records.rowCount}` });
+    });
+  } catch (error) {
     return res
-      .status(200)
-      .json({ message: `records deleted : ${response.rowCount}` });
-  });
+      .status(500)
+      .json({ message: "Internal Server Error", errorMessage: error.message });
+  }
 }
 
 async function deleteProductsByIdInRangeApi(req, res) {
@@ -119,12 +166,18 @@ async function deleteProductsByIdInRangeApi(req, res) {
     (_, index) => start + index
   );
   const query = format(deleteProductsById, ids);
-  pool.query(query, (error, response) => {
-    if (error) throw error;
+  try {
+    pool.query(query, (error, records) => {
+      if (error) throw error;
+      return res
+        .status(200)
+        .json({ message: `records deleted : ${records.rowCount}` });
+    });
+  } catch (error) {
     return res
-      .status(200)
-      .json({ message: `records deleted : ${response.rowCount}` });
-  });
+      .status(500)
+      .json({ message: "Internal Server Error", errorMessage: error.message });
+  }
 }
 
 export {
