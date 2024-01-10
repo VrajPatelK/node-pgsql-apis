@@ -14,9 +14,9 @@ const PORT = Number(process.env.SERVER_PORT);
 
 // middlewares
 app.use(express.json());
-app.use("/api/products/v1/", product_routers);
-app.use("/api/users/v1/", user_routers);
-app.use("/api/carts/v1/", cart_routers);
+app.use("/api/v1/products/", product_routers);
+app.use("/api/v1/users/", user_routers);
+app.use("/api/v1/carts/", cart_routers);
 
 // server
 app.listen(PORT, () => {
