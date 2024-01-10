@@ -15,6 +15,9 @@ PRICE=$4,
 QUANTITY_IN_STOCK = $5, 
 CATEGORY = $6
 WHERE ID = $1`;
+const deductStock = `UPDATE PRODUCTS SET 
+quantity_in_stock = $2
+WHERE ID = $1`;
 
 const deleteProductById = `DELETE FROM PRODUCTS WHERE ID = $1`;
 const deleteProductsById = `DELETE FROM PRODUCTS WHERE ID in (%L)`;
@@ -26,6 +29,7 @@ export {
   getProductById,
   getProductsById,
   updateProductById,
+  deductStock,
   deleteProductById,
   deleteProductsById,
 };

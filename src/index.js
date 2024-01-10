@@ -7,6 +7,7 @@ import "colors";
 import product_routers from "./routers/products.js";
 import user_routers from "./routers/users.js";
 import cart_routers from "./routers/carts.js";
+import order_routers from "./routers/orders.js";
 
 dotenv.config();
 const app = express();
@@ -17,6 +18,7 @@ app.use(express.json());
 app.use("/api/v1/products/", product_routers);
 app.use("/api/v1/users/", user_routers);
 app.use("/api/v1/carts/", cart_routers);
+app.use("/api/v1/orders/", order_routers);
 
 // server
 app.listen(PORT, () => {

@@ -6,6 +6,7 @@ import {
   getAllProducts,
   getProductById,
   updateProductById,
+  deductStock,
   deleteProductById,
   deleteProductsById,
   getProductsById,
@@ -71,11 +72,11 @@ async function getProductsByIdInRangeApi(req, res) {
   const { start: s, end: e } = req.params;
   const start = parseInt(s);
   const end = parseInt(e);
-  var ids = Array.from(
+  var productIds = Array.from(
     { length: end - start + 1 },
     (_, index) => start + index
   );
-  const query = format(getProductsById, ids);
+  const query = format(getProductsById, productIds);
   try {
     pool.query(query, (error, records) => {
       if (error) throw error;
@@ -89,9 +90,9 @@ async function getProductsByIdInRangeApi(req, res) {
 }
 
 async function getProductByIdApi(req, res) {
-  const { id } = req.params;
+  const { productId } = req.params;
   try {
-    pool.query(getProductById, [id], (error, records) => {
+    pool.query(getProductById, [productId], (error, records) => {
       if (error) throw error;
       return res.status(200).json(records.rows);
     });
@@ -103,12 +104,33 @@ async function getProductByIdApi(req, res) {
 }
 
 async function updateProductByIdApi(req, res) {
-  const { id } = req.params;
+  const { productId } = req.params;
   const { name, description, price, quantity_in_stock, category } = req.body;
   try {
     pool.query(
       updateProductById,
-      [id, name, description, price, quantity_in_stock, category],
+      [productId, name, description, price, quantity_in_stock, category],
+      (error, records) => {
+        if (error) throw error;
+        return res
+          .status(200)
+          .json({ message: `records updated : ${records.rowCount}` });
+      }
+    );
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: "Internal Server Error", errorMessage: error.message });
+  }
+}
+
+async function deductStockApi(req, res) {
+  const { productId } = req?.params;
+  const { updated_quantity } = req?.body;
+  try {
+    pool.query(
+      deductStock,
+      [parseInt(productId), updated_quantity],
       (error, records) => {
         if (error) throw error;
         return res
@@ -124,9 +146,9 @@ async function updateProductByIdApi(req, res) {
 }
 
 async function deleteProductByIdApi(req, res) {
-  const { id } = req.params;
+  const { productId } = req.params;
   try {
-    pool.query(deleteProductById, [id], (error, records) => {
+    pool.query(deleteProductById, [productId], (error, records) => {
       if (error) throw error;
       return res
         .status(200)
@@ -140,9 +162,11 @@ async function deleteProductByIdApi(req, res) {
 }
 
 async function deleteProductsByIdApi(req, res) {
-  const { ids } = req.params;
-  var ids_converted = ids.split(",").map((id) => parseInt(id));
-  const query = format(deleteProductsById, ids_converted);
+  const { productIds } = req.params;
+  var productIds_converted = productIds
+    .split(",")
+    .map((productId) => parseInt(productId));
+  const query = format(deleteProductsById, productIds_converted);
   try {
     pool.query(query, (error, records) => {
       if (error) throw error;
@@ -161,11 +185,11 @@ async function deleteProductsByIdInRangeApi(req, res) {
   const { start: s, end: e } = req.params;
   const start = parseInt(s);
   const end = parseInt(e);
-  var ids = Array.from(
+  var productIds = Array.from(
     { length: end - start + 1 },
     (_, index) => start + index
   );
-  const query = format(deleteProductsById, ids);
+  const query = format(deleteProductsById, productIds);
   try {
     pool.query(query, (error, records) => {
       if (error) throw error;
@@ -187,6 +211,7 @@ export {
   createNewProductApi,
   createNewProductsApi,
   updateProductByIdApi,
+  deductStockApi,
   deleteProductByIdApi,
   deleteProductsByIdApi,
   deleteProductsByIdInRangeApi,
